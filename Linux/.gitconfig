@@ -1,0 +1,59 @@
+[alias]
+    c = !"git ci -F COMMIT_EDITMSG.mkd -e && osend && v COMMIT_EDITMSG.mkd -c 'set modified'"# && git s"
+    s = !"git status; echo -e '---'; git sl"
+    sl = !"cat COMMIT_EDITMSG.mkd"
+    e = !"v COMMIT_EDITMSG.mkd"
+    d = difftool
+    dc = difftool --cached
+    #diffc = diff --cached
+    diffc = "!f() { local r a f; r=`git rev-parse --revs-only \"$@\"` && r=${r:-HEAD} && a=`git rev-parse --sq --no-revs --flags \"$@\"` && f=`git rev-parse --sq --no-revs --no-flags \
+    "$@\"` && cd ./$GIT_PREFIX && eval \"git diff $a $r^..$r -- $f\"; }; f"
+    mt = mergetool
+    ci = commit
+    ca = commit -a
+    co = checkout
+    cp = cherry-pick
+    st = diff --name-status
+    superpack = repack -adf --window=100 --depth=250
+    pulse = !"if git rev-parse --verify --quiet --no-revs HEAD; then git ci -m 'Pulse.'; else if [ ! $(git ls-files) ]; then git add -A; fi; git commit -m 'Initial Pulse.'; fi"
+    spulse = !"if git rev-parse --verify --quiet --no-revs HEAD; then git add -A; git ci -m 'Pulse.'; else git add -A; git commit -m 'Initial Pulse.'; fi"
+    ls-crop = ls-files -o --exclude-standard
+    harvest = !"git ls-crop | xargs git add"
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    lgme = log --graph  --date=local --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --committer=drew.lum@transmarketgroup.com
+    lglong = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+    up = !"git pull --rebase"
+    gup = !"git pull --rebase && git push"
+    send = !"git up && git push"
+    svnup = !"git stash && git up && git stash pop"
+    undo = reset --soft HEAD^
+    st = diff --name-status
+    caa = commit -a --amend -C HEAD
+    rh = reset --hard
+    cont = rebase --continue
+
+[color]
+    ui = auto
+
+[diff]
+    tool = myvimdiff
+    renames = copy
+    mnemonicprefix = true
+
+[difftool]
+    prompt =
+
+[difftool "myvimdiff"]
+     cmd = vim -n -d -c 'wincmd l' \"$LOCAL\" \"$REMOTE\"
+
+[merge]
+    tool = myvimdiff
+
+[mergetool "myvimdiff"]
+    cmd = vim -n -d -c 'wincmd l' \"$LOCAL\" \"$MERGED\" \"$REMOTE\"
+
+[user]
+	name = "Drew Lum"
+	email = drew.lum@gmail.com
+[push]
+	default = matching

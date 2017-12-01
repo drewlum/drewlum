@@ -1,0 +1,9 @@
+.idea
+.netrwhist
+.ipynb_checkpoints
+*.pyc
+*.csv
+ShellScripts
+bundle
+Linux/.vim/plugged
+*.swp

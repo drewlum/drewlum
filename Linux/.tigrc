@@ -1,0 +1,2 @@
+[tig] show-rev-graph = true
+[tig] set read-git-colors = no

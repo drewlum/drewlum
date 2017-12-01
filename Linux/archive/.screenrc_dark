@@ -1,0 +1,10 @@
+terminfo rxvt-unicode 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+startup_message off
+vbell off
+escape /
+defscrollback 15000
+hardstatus alwayslastline
+#caption always "%{= kw}%-w%{= BW}%n %t%{-}%+w %-= %c"
+vbell off
+hardstatus string '%{= kG}%-Lw%{= kW}%50> %n*%f %t%{= kG}%+Lw%< %{= kG}%-=%D %m/%d/%y | %C:%s %A | %1`%{-}'
+hardstatus string '%{= kG}%{C}Term: %{c}%{= kG}[%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{C} %m-%d-%y %{W}%C:%s %{g}]'
