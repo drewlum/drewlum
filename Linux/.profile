@@ -1,7 +1,8 @@
 #.profile
 
-if [ $(uname) == "Darwin" ];then
-     export MANPATH=${MANPATH}:/opt/texlive2015/texmf-dist/doc/info:/opt/texlive2015/texmf-dist/doc/info
+if [ $(uname) == "Darwin" ]
+then
+#     export MANPATH=${MANPATH}:/opt/texlive2015/texmf-dist/doc/info:/opt/texlive2015/texmf-dist/doc/info
 
      # virtualenv
      export WORKON_HOME=~/virtualenvs

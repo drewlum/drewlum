@@ -14,6 +14,11 @@ else
   alias xterm='xterm -bg black -fg white'
 fi
 
+#### Teza ###
+alias sr='ssh -l root -i ${HOME}/.ssh/root/id_rsa'
+alias sr2='ssh -l root -i ${HOME}/.ssh/root/id_rsa_new'
+alias sw='ssh -l admin@$*'
+#### End Teza ####
 alias xterm='xterm -bg black -fg white'
 alias cmaked='cmake -DCMAKE_BUILD_TYPE=Debug -Dbuild_tests=True -G"${UNIX_MAKE}" $*'
 alias cmaker='cmake -DCMAKE_BUILD_TYPE=Release -G"${UNIX_MAKE}" $*'

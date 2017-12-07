@@ -5,7 +5,7 @@ if [ $(uname) == "Darwin" ];then
 
      # virtualenv
      export WORKON_HOME=~/virtualenvs
-     source /Library/Frameworks/Python.framework/Versions/2.7/bin/virtualenvwrapper.sh
+     #source /Library/Frameworks/Python.framework/Versions/2.7/bin/virtualenvwrapper.sh
      #source /usr/local/bin/virtualenvwrapper.sh
      export PATH=${HOME}/anaconda/bin:${HOME}/opt/bin:${HOME}/opt:${HOME}/git/drewlum/ShellScripts:${PATH}
 

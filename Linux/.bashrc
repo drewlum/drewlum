@@ -8,7 +8,11 @@ case $- in
       *) return;;
 esac
 
-if [ $(uname) == "Linux" ];then
+if [ $(uname) == "Darwin" ]
+then
+  source ~/.profile
+  export PATH=${HOME}/anaconda/bin:${HOME}/opt/bin:${HOME}/opt:${HOME}/git/drewlum/ShellScripts:${PATH}
+else
   # don't put duplicate lines or lines starting with space in the history.
   # See bash(1) for more options
   HISTCONTROL=ignoreboth
@@ -17,8 +21,8 @@ if [ $(uname) == "Linux" ];then
   shopt -s histappend
 
   # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-  HISTSIZE=1000
-  HISTFILESIZE=2000
+  #HISTSIZE=1000
+  #HISTFILESIZE=2000
 
   # check the window size after each command and, if necessary,
   # update the values of LINES and COLUMNS.
@@ -120,14 +124,12 @@ if [ $(uname) == "Linux" ];then
   umask u=rwx,g=rx,o=
   ulimit -c 10000000
   
-  # Contains:
-  # .bash_aliases
-  # .bash_colors
-  [ -L ~/.bash_profile ] &&  source  ~/.bash_profile
-else
-  source ~/.profile
-  export PATH=${HOME}/anaconda/bin:${HOME}/opt/bin:${HOME}/opt:${HOME}/git/drewlum/ShellScripts:${PATH}
 fi
+
+# Contains:
+# .bash_aliases
+# .bash_colors
+[ -L ~/.bash_profile ] &&  source  ~/.bash_profile
 
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
