@@ -8,11 +8,8 @@ case $- in
       *) return;;
 esac
 
-if [ $(uname) == "Darwin" ]
+if [ $(uname) == "Linux" ]
 then
-  source ~/.profile
-  export PATH=${HOME}/anaconda/bin:${HOME}/opt/bin:${HOME}/opt:${HOME}/git/drewlum/ShellScripts:${PATH}
-else
   # don't put duplicate lines or lines starting with space in the history.
   # See bash(1) for more options
   HISTCONTROL=ignoreboth
@@ -130,6 +127,3 @@ fi
 # .bash_aliases
 # .bash_colors
 [ -L ~/.bash_profile ] &&  source  ~/.bash_profile
-
-
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
