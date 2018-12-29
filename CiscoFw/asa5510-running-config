@@ -1,22 +1,33 @@
-asa5510# sh run
+asa5510# more system:running-config
 : Saved
 :
-ASA Version 8.0(3)
+: Serial Number: JMX1037K0BT
+: Hardware:   ASA5510-K8, 1280 MB RAM, CPU Pentium 4 Celeron 1600 MHz
+: Written by drew at 17:09:07.221 CST Sat Dec 29 2018
+!
+ASA Version 9.1(7)20
 !
 hostname asa5510
 domain-name lum-home.net
 enable password M8ugxh4iPXj4OXYt encrypted
+xlate per-session deny tcp any4 any4
+xlate per-session deny tcp any4 any6
+xlate per-session deny tcp any6 any4
+xlate per-session deny tcp any6 any6
+xlate per-session deny udp any4 any4 eq domain
+xlate per-session deny udp any4 any6 eq domain
+xlate per-session deny udp any6 any4 eq domain
+xlate per-session deny udp any6 any6 eq domain
+passwd iUILqwkHM9bM0Mho encrypted
 names
+ip local pool VPN-POOL 192.168.4.1-192.168.4.10 mask 255.255.255.0
 !
 interface Ethernet0/0
- speed 1000
- duplex full
  nameif outside
  security-level 0
  ip address dhcp setroute
 !
 interface Ethernet0/1
- speed 1000
  nameif inside
  security-level 100
  ip address 192.168.1.113 255.255.255.128
@@ -38,8 +49,6 @@ interface Management0/0
  no security-level
  no ip address
 !
-passwd iUILqwkHM9bM0Mho encrypted
-boot system disk0:/asa803-k8.bin
 boot system disk0:/asa917-20-k8.bin
 ftp mode passive
 clock timezone CST -6
@@ -47,21 +56,59 @@ clock summer-time CDT recurring
 dns server-group DefaultDNS
  domain-name lum-home.net
 same-security-traffic permit intra-interface
+object network obj-192.168.1.0
+ subnet 192.168.1.0 255.255.255.128
+object network obj-192.168.4.0
+ subnet 192.168.4.0 255.255.255.0
+object network obj-192.168.1.116
+ host 192.168.1.116
+object network obj-192.168.1.120
+ host 192.168.1.120
+object network obj-192.168.1.115
+ host 192.168.1.115
+object network obj_any
+ subnet 0.0.0.0 0.0.0.0
+object network obj-0.0.0.0
+ host 0.0.0.0
+object network obj_any-01
+ subnet 0.0.0.0 0.0.0.0
+object network obj-172.16.8.0
+ subnet 172.16.8.0 255.255.255.0
+object network obj_any-02
+ subnet 0.0.0.0 0.0.0.0
+object network inside-out
+ subnet 13.107.4.0 255.255.255.0
+object network xbox
+ host 192.168.1.67
+ description xbox
+object-group service XBOX_PORTS
+ service-object tcp destination eq www
+ service-object tcp destination eq 3074
+ service-object tcp destination eq domain
+ service-object udp destination eq 88
+ service-object udp destination eq 3074
+ service-object udp destination eq isakmp
+ service-object udp destination eq 3544
+ service-object udp destination eq 4500
+object-group network MSFT_XBOX
+ description Microsoft Xbox
+ network-object 13.107.4.0 255.255.255.0
+ network-object 204.79.197.0 255.255.255.0
 access-list REMOTE-VPN-LIST standard permit 192.168.4.0 255.255.255.0
 access-list SPLIT-TUNNEL standard permit 192.168.1.0 255.255.255.128
 access-list NONAT-2 extended permit ip 192.168.1.0 255.255.255.128 192.168.4.0 255.255.255.0
-access-list in-internet extended permit udp any host 8.8.4.4 eq domain
-access-list in-internet extended permit udp any host 8.8.8.8 eq domain
-access-list in-dmz extended permit udp any host 75.75.75.75 eq domain
-access-list in-dmz extended permit tcp any host 98.138.74.44 eq 993
-access-list in-dmz extended permit tcp any host 98.138.13.27 eq 993
-access-list in-dmz extended permit tcp any host 98.138.74.45 eq 993
-access-list in-dmz extended permit udp any host 208.83.244.21 eq domain log
-access-list in-dmz extended permit ip any 208.83.244.0 255.255.255.0 log
-access-list in-dmz extended permit ip any 208.83.246.0 255.255.255.0 log
-access-list in-dmz extended permit ip any any
-access-list in-dmz extended permit udp any host 8.8.8.8 eq domain
-access-list in-dmz extended permit udp any host 8.8.4.4 eq domain
+access-list in-internet extended permit udp any4 host 8.8.4.4 eq domain inactive
+access-list in-internet extended permit udp any4 host 8.8.8.8 eq domain inactive
+access-list in-dmz extended permit udp any4 host 75.75.75.75 eq domain
+access-list in-dmz extended permit tcp any4 host 98.138.74.44 eq 993
+access-list in-dmz extended permit tcp any4 host 98.138.13.27 eq 993
+access-list in-dmz extended permit tcp any4 host 98.138.74.45 eq 993
+access-list in-dmz extended permit udp any4 host 208.83.244.21 eq domain log
+access-list in-dmz extended permit ip any4 208.83.244.0 255.255.255.0 log
+access-list in-dmz extended permit ip any4 208.83.246.0 255.255.255.0 log
+access-list in-dmz extended permit ip any4 any4 inactive
+access-list in-dmz extended permit udp any4 host 8.8.8.8 eq domain
+access-list in-dmz extended permit udp any4 host 8.8.4.4 eq domain
 pager lines 35
 logging enable
 logging timestamp
@@ -75,32 +122,44 @@ logging facility 23
 mtu outside 1500
 mtu inside 1500
 mtu DMZ 1500
-ip local pool VPN-POOL 192.168.4.1-192.168.4.10 mask 255.255.255.0
 icmp unreachable rate-limit 1 burst-size 1
 icmp permit any inside
 icmp permit any DMZ
-asdm image disk0:/asdm-791.bin
+asdm image disk0:/asdm-791-151.bin
 no asdm history enable
 arp timeout 4096
-nat-control
-global (outside) 1 interface
-nat (inside) 0 access-list NONAT-2
-nat (inside) 1 192.168.1.0 255.255.255.128
-nat (DMZ) 1 172.16.8.0 255.255.255.0
-static (inside,DMZ) 192.168.1.116 192.168.1.116 netmask 255.255.255.255
-static (inside,DMZ) 172.16.8.254 192.168.1.120 netmask 255.255.255.255
-static (inside,DMZ) 192.168.1.115 192.168.1.115 netmask 255.255.255.255
-access-group in-internet in interface outside
+no arp permit-nonconnected
+!
+object network obj-192.168.1.0
+ nat (inside,outside) dynamic interface
+object network obj-192.168.1.116
+ nat (inside,DMZ) static 192.168.1.116
+object network obj-192.168.1.120
+ nat (inside,DMZ) static 172.16.8.254
+object network obj-192.168.1.115
+ nat (inside,DMZ) static 192.168.1.115
+object network obj_any
+ nat (inside,outside) dynamic obj-0.0.0.0
+object network obj_any-01
+ nat (inside,DMZ) dynamic obj-0.0.0.0
+object network obj-172.16.8.0
+ nat (DMZ,outside) dynamic interface
+object network obj_any-02
+ nat (DMZ,outside) dynamic obj-0.0.0.0
 access-group in-dmz in interface DMZ
 route inside 192.168.99.0 255.255.255.0 192.168.99.254 1
 timeout xlate 3:00:00
+timeout pat-xlate 0:00:30
 timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 icmp 0:00:02
 timeout sunrpc 0:10:00 h323 0:05:00 h225 1:00:00 mgcp 0:05:00 mgcp-pat 0:05:00
 timeout sip 0:30:00 sip_media 0:02:00 sip-invite 0:03:00 sip-disconnect 0:02:00
-timeout uauth 0:05:00 absolute
+timeout sip-provisional-media 0:02:00 uauth 0:05:00 absolute
+timeout tcp-proxy-reassembly 0:01:00
+timeout floating-conn 0:00:00
 dynamic-access-policy-record DfltAccessPolicy
 aaa-server TACACS+ protocol tacacs+
 aaa-server RADIUS protocol radius
+user-identity default-domain LOCAL
 aaa authentication ssh console LOCAL
 aaa authentication enable console LOCAL
 aaa authorization command LOCAL
@@ -108,30 +167,34 @@ http server enable
 http 192.168.1.0 255.255.255.128 inside
 no snmp-server location
 no snmp-server contact
-snmp-server enable traps snmp authentication linkup linkdown coldstart
-crypto ipsec transform-set REMOTE-VPN esp-3des esp-md5-hmac
-crypto dynamic-map REMOTE-ACCESS 1 set transform-set REMOTE-VPN
+crypto ipsec ikev1 transform-set REMOTE-VPN esp-3des esp-md5-hmac
+crypto ipsec security-association pmtu-aging infinite
+crypto dynamic-map REMOTE-ACCESS 1 set ikev1 transform-set REMOTE-VPN
 crypto dynamic-map REMOTE-ACCESS 1 set reverse-route
 crypto map myMap 1 ipsec-isakmp dynamic REMOTE-ACCESS
 crypto map myMap interface outside
-crypto isakmp enable outside
-crypto isakmp policy 1
+crypto ca trustpool policy
+crypto ikev1 enable outside
+crypto ikev1 policy 1
  authentication pre-share
  encryption 3des
  hash sha
  group 2
  lifetime 43200
-crypto isakmp policy 65535
+crypto ikev1 policy 65535
  authentication pre-share
  encryption 3des
  hash sha
  group 2
  lifetime 86400
 telnet timeout 5
+ssh scopy enable
+ssh stricthostkeycheck
 ssh 192.168.1.0 255.255.255.128 inside
 ssh 172.16.8.0 255.255.255.0 DMZ
 ssh timeout 5
 ssh version 2
+ssh key-exchange group dh-group1-sha1
 console timeout 0
 dhcpd address 192.168.1.40-192.168.1.99 inside
 dhcpd dns 192.168.1.10 75.75.75.75 interface inside
@@ -145,11 +208,12 @@ dhcpd enable DMZ
 !
 threat-detection basic-threat
 threat-detection statistics access-list
+no threat-detection statistics tcp-intercept
 ntp server 17.254.0.49
 group-policy lumnet internal
 group-policy lumnet attributes
  dns-server value 8.8.8.8 8.8.4.4
- vpn-tunnel-protocol IPSec
+ vpn-tunnel-protocol ikev1
  split-tunnel-policy tunnelspecified
  split-tunnel-network-list value SPLIT-TUNNEL
 username admin password h0c78ns1tDURO3ii encrypted privilege 15
@@ -160,7 +224,7 @@ tunnel-group lumnet general-attributes
  address-pool VPN-POOL
  default-group-policy lumnet
 tunnel-group lumnet ipsec-attributes
- pre-shared-key *
+ ikev1 pre-shared-key *
 !
 class-map inspection_default
  match default-inspection-traffic
@@ -172,8 +236,21 @@ policy-map global_policy
   inspect rtsp
   inspect icmp
   inspect ipsec-pass-thru
+  inspect ip-options
 !
 service-policy global_policy global
 prompt hostname context
-Cryptochecksum:8831077e566c8427c8d68c77f4cb4870
+no call-home reporting anonymous
+call-home
+ profile CiscoTAC-1
+  no active
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination address email callhome@cisco.com
+  destination transport-method http
+  subscribe-to-alert-group diagnostic
+  subscribe-to-alert-group environment
+  subscribe-to-alert-group inventory periodic monthly
+  subscribe-to-alert-group configuration periodic monthly
+  subscribe-to-alert-group telemetry periodic daily
+Cryptochecksum:9bd3d5d5096ee5b64f6c3dff3e170a71
 : end
