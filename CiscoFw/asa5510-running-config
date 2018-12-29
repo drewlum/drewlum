@@ -1,0 +1,173 @@
+: Saved
+: Written by enable_15 at 14:56:26.849 CST Sun Dec 31 2017
+!
+ASA Version 8.0(3) 
+!
+hostname asa5510
+domain-name lum-home.net
+enable password M8ugxh4iPXj4OXYt encrypted
+names
+dns-guard
+!
+interface Ethernet0/0
+ speed 1000
+ duplex full
+ nameif outside
+ security-level 0
+ ip address dhcp setroute 
+!
+interface Ethernet0/1
+ speed 1000
+ nameif inside
+ security-level 100
+ ip address 192.168.1.113 255.255.255.128 
+!
+interface Ethernet0/2
+ nameif DMZ
+ security-level 30
+ ip address 172.16.8.1 255.255.255.0 
+!
+interface Ethernet0/3
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface Management0/0
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+passwd iUILqwkHM9bM0Mho encrypted
+boot config disk0:/startup-config-2-2016
+ftp mode passive
+clock timezone CST -6
+clock summer-time CDT recurring
+dns server-group DefaultDNS
+ domain-name lum-home.net
+same-security-traffic permit intra-interface
+access-list in-internet extended permit udp any host 8.8.4.4 eq domain 
+access-list in-internet extended permit udp any host 8.8.8.8 eq domain 
+access-list REMOTE-VPN-LIST standard permit 192.168.4.0 255.255.255.0 
+access-list SPLIT-TUNNEL standard permit 192.168.1.0 255.255.255.128 
+access-list NONAT-2 extended permit ip 192.168.1.0 255.255.255.128 192.168.4.0 255.255.255.0 
+access-list in-dmz extended permit udp any host 75.75.75.75 eq domain 
+access-list in-dmz extended permit tcp any host 98.138.74.44 eq 993 
+access-list in-dmz extended permit tcp any host 98.138.13.27 eq 993 
+access-list in-dmz extended permit tcp any host 98.138.74.45 eq 993 
+access-list in-dmz extended permit udp any host 208.83.244.21 eq domain log 
+access-list in-dmz extended permit ip any 208.83.244.0 255.255.255.0 log 
+access-list in-dmz extended permit ip any 208.83.246.0 255.255.255.0 log 
+access-list in-dmz extended permit ip any any 
+access-list in-dmz extended permit udp any host 8.8.8.8 eq domain 
+access-list in-dmz extended permit udp any host 8.8.4.4 eq domain 
+pager lines 35
+logging enable
+logging timestamp
+logging standby
+logging buffer-size 8192
+logging monitor debugging
+logging buffered notifications
+logging trap informational
+logging asdm informational
+logging facility 23
+mtu outside 1500
+mtu inside 1500
+mtu DMZ 1500
+ip local pool VPN-POOL 192.168.4.1-192.168.4.10 mask 255.255.255.0
+icmp unreachable rate-limit 1 burst-size 1
+icmp permit any inside
+icmp permit any DMZ
+asdm image disk0:/asdm-611.bin
+no asdm history enable
+arp timeout 4096
+nat-control
+global (outside) 1 interface
+nat (inside) 0 access-list NONAT-2
+nat (inside) 1 192.168.1.0 255.255.255.128
+nat (DMZ) 1 172.16.8.0 255.255.255.0
+static (inside,DMZ) 192.168.1.116 192.168.1.116 netmask 255.255.255.255 
+static (inside,DMZ) 172.16.8.254 192.168.1.120 netmask 255.255.255.255 
+static (inside,DMZ) 192.168.1.115 192.168.1.115 netmask 255.255.255.255 
+access-group in-internet in interface outside
+access-group in-dmz in interface DMZ
+route inside 192.168.99.0 255.255.255.0 192.168.99.254 1
+timeout xlate 3:00:00
+timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 icmp 0:00:02
+timeout sunrpc 0:10:00 h323 0:05:00 h225 1:00:00 mgcp 0:05:00 mgcp-pat 0:05:00
+timeout sip 0:30:00 sip_media 0:02:00 sip-invite 0:03:00 sip-disconnect 0:02:00
+timeout uauth 0:05:00 absolute
+dynamic-access-policy-record DfltAccessPolicy
+aaa-server TACACS+ protocol tacacs+
+aaa-server RADIUS protocol radius
+no snmp-server location
+no snmp-server contact
+snmp-server enable traps snmp authentication linkup linkdown coldstart
+crypto ipsec transform-set REMOTE-VPN esp-3des esp-md5-hmac 
+crypto dynamic-map REMOTE-ACCESS 1 set transform-set REMOTE-VPN
+crypto dynamic-map REMOTE-ACCESS 1 set reverse-route
+crypto map myMap 1 ipsec-isakmp dynamic REMOTE-ACCESS
+crypto map myMap interface outside
+crypto isakmp enable outside
+crypto isakmp policy 1
+ authentication pre-share
+ encryption 3des
+ hash sha
+ group 2
+ lifetime 43200
+crypto isakmp policy 65535
+ authentication pre-share
+ encryption 3des
+ hash sha
+ group 2
+ lifetime 86400
+telnet timeout 5
+ssh 192.168.1.0 255.255.255.128 inside
+ssh 172.16.8.0 255.255.255.0 DMZ
+ssh timeout 5
+ssh version 2
+console timeout 0
+dhcpd address 192.168.1.40-192.168.1.99 inside
+dhcpd dns 192.168.1.10 75.75.75.75 interface inside
+dhcpd lease 7200 interface inside
+dhcpd enable inside
+!
+dhcpd address 172.16.8.100-172.16.8.250 DMZ
+dhcpd dns 8.8.8.8 8.8.4.4 interface DMZ
+dhcpd lease 7200 interface DMZ
+dhcpd enable DMZ
+!
+threat-detection basic-threat
+threat-detection statistics access-list
+ntp server 17.254.0.49
+group-policy lumnet internal
+group-policy lumnet attributes
+ dns-server value 8.8.8.8 8.8.4.4
+ vpn-tunnel-protocol IPSec 
+ split-tunnel-policy tunnelspecified
+ split-tunnel-network-list value SPLIT-TUNNEL
+username dlum password vuzhM/nUvI5pYdV4 encrypted privilege 15
+tunnel-group lumnet type remote-access
+tunnel-group lumnet general-attributes
+ address-pool VPN-POOL
+ default-group-policy lumnet
+tunnel-group lumnet ipsec-attributes
+ pre-shared-key *
+!
+class-map inspection_default
+ match default-inspection-traffic
+!
+!
+policy-map global_policy
+ class inspection_default
+  inspect ftp 
+  inspect sip  
+  inspect rtsp 
+  inspect icmp 
+  inspect ipsec-pass-thru 
+!
+service-policy global_policy global
+prompt hostname context 
+Cryptochecksum:d46b37b66ad9a06b19e586fdcac17ca6
+: end
