@@ -1,4 +1,4 @@
 #!/bin/bash
-
-for i in `ls -a $HOME/git/workspace/Linux/ | grep \.[a-z]`;do ln -sf $HOME/git/workspace/Linux/$i;done
+WORKDIR="${HOME}/git/drewlum/Linux"
+for i in `ls -a ${WORKDIR} | grep \.[a-z]`;do ln -sf ${WORKDIR}/$i;done
 

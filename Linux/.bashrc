@@ -127,3 +127,5 @@ fi
 # .bash_aliases
 # .bash_colors
 [ -L ~/.bash_profile ] &&  source  ~/.bash_profile
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
